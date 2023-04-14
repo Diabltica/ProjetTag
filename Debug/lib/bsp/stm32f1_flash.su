@@ -1,9 +1,0 @@
-core_cm3.h:1762:34:__NVIC_SystemReset	4	static,ignoring_inline_asm
-stm32f1_flash.c:41:6:FLASH_demo	16	static
-stm32f1_flash.c:63:6:FLASH_set_word	24	static
-stm32f1_flash.c:78:10:FLASH_read_word	24	static
-stm32f1_flash.c:95:6:FLASH_dump	16	static
-stm32f1_flash.c:112:13:FLASH_erase_everything_else	1048	static
-stm32f1_flash.c:127:13:FLASH_erase	8	static
-stm32f1_flash.c:140:13:FLASH_write_word	16	static
-stm32f1_flash.c:154:6:FLASH_kill	16	static
