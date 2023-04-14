@@ -25,7 +25,9 @@
 
 
 // PRIVATE CONSTANTS -----------------------------------------------------------
-
+struct tag_t{uint32_t mem_address;
+uint32_t ram_buffer;
+State state;};
 
 
 // PRIVATE FUNCTIONS DEFINITIONS -----------------------------------------------
@@ -44,6 +46,10 @@ extern Tag* Tag_new(uint32_t mem_address)
 	this->ram_buffer = EMPTY_SERIAL;
 
 	...
+}
+
+extern setSerial(uint32_t){
+}
 }
 
 
