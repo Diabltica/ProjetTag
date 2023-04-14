@@ -1,38 +1,74 @@
-/*
- * blinky_main.c
- *
- *  Created on: 17 janv. 2023
- *      Author: jjousse
- */
+/**
+  ******************************************************************************
+  * @file    main.c
+  * @author  Nirgal
+  * @date    03-July-2019
+  * @brief   Default main function.
+  ******************************************************************************
+*/
+#include "stm32f1xx_hal.h"
+#include "stm32f1_sys.h"
+#include "macro_types.h"
+#include "stm32f1_gpio.h"
+#include "stm32f1_flash.h"
+
+#include "tag.h"
+
+int main(void)
+{
+	//Initialisation de la couche logicielle HAL (Hardware Abstraction Layer)
+	//Cette ligne doit rester la première étape de la fonction main().
+	HAL_Init();
+
+	//Initialisation UART2
+	UART_init(UART2_ID,115200);
+
+	//Redirection stdin stdout stderr
+	SYS_set_std_usart(UART2_ID, UART2_ID, UART2_ID);
+
+	//Initialisation du port du bouton bleu (carte Nucleo)
+	BSP_GPIO_PinCfg(BLUE_BUTTON_GPIO, BLUE_BUTTON_PIN, GPIO_MODE_INPUT,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+
+	// Création du tag
 
 
-#define STM32F103xB
-#define DELAY 800000
-
-#include "stm32f1xx.h"
-#include <stdint.h>
-/*
-int main (void){
-
-	//enable clock on GPIO port A
-	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
+	// Démarrage du tag
 
 
-	// now set port A pin 5 to output with max speed of 2MHz and type = push-pull
-	GPIOA->CRL &= ~GPIO_CRL_CNF5_Msk;
-	GPIOA->CRL |= GPIO_CRL_MODE5_1;
-	GPIOA->CRL &= ~GPIO_CRL_MODE5_0;
 
-	//blinking forever
-	while (1)
+	while(1)
 	{
+		//Si on reçoit une donnée
+		if( UART_data_ready(UART2_ID) )
+		{
 
-		    GPIOA->ODR |= GPIO_ODR_ODR5_Msk;	//set bit 5: LED green on
+			switch(UART_get_next_byte(UART2_ID))
+			{
+			case '?':
+				Tag_printSerial(eco_tag);
+				break;
+			case 'L':
+				Tag_loadMem(eco_tag);
+				break;
+			case 'S':
+				Tag_storeMem(eco_tag);
+				break;
+			case '.':
+				Tag_sleep(eco_tag);
+				break;
 
-		    for (uint32_t i=0; i<=DELAY; i++); // Time ON: delay loop
 
-		    GPIOA->ODR &= ~GPIO_ODR_ODR5_Msk;  //clear bit 5: LED green off
 
-		    for (uint32_t i=0; i<=DELAY; i++); // Time OFF: delay loop
+			default:
+				break;
+			}
+		}
+
+//		//TODO: event driven mode with event queue
+//		while( next_event_available() )
+//		{
+//			laser_run(mars_link, next_event)
+//		}
+//		deep_sleep();
 	}
-}*/
+}
