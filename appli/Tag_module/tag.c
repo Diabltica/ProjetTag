@@ -58,12 +58,15 @@ extern void Tag_start(Tag *this){
 extern void Tag_setSerial(Tag *this, uint32_t serial){
 
 }
+
 extern void Tag_printSerial(Tag* this){
 
 }
+
 extern void Tag_sleep(Tag *this){
 
 }
+
 extern void Tag_storeMem(Tag* this){
 	FLASH_set_word(this->flash_address, this->serialNumber);
 }
