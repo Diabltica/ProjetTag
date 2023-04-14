@@ -52,3 +52,7 @@ extern Tag* Tag_new(uint32_t mem_address)
 extern setSerial(uint32_t){
 }
 }
+
+extern void Tag_free(Tag *this){
+	free(this);
+}
