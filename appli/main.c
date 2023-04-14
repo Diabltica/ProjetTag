@@ -63,12 +63,5 @@ int main(void)
 				break;
 			}
 		}
-
-//		//TODO: event driven mode with event queue
-//		while( next_event_available() )
-//		{
-//			laser_run(mars_link, next_event)
-//		}
-//		deep_sleep();
 	}
 }
