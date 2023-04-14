@@ -30,10 +30,12 @@ int main(void)
 	BSP_GPIO_PinCfg(BLUE_BUTTON_GPIO, BLUE_BUTTON_PIN, GPIO_MODE_INPUT,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
 
 	// Création du tag
-
+	int memory_address = 49;
+	Tag eco_tag = Tag_new(memory_address);
 
 	// Démarrage du tag
 
+	Tag_start(&eco_tag);
 
 	while(1)
 	{
@@ -44,6 +46,7 @@ int main(void)
 
 			switch(UART_get_next_byte(UART2_ID))
 			{
+
 			case '?':
 				Tag_printSerial(eco_tag);
 				break;
@@ -56,9 +59,6 @@ int main(void)
 			case '.':
 				Tag_sleep(eco_tag);
 				break;
-
-
-
 			default:
 				break;
 			}
