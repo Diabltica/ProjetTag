@@ -28,7 +28,8 @@
 struct tag_t{
 	uint32_t flash_address;
 	uint32_t ram_buffer;
-	State state;};
+	State state;
+	uint32_t serialNumber;};
 
 
 
@@ -47,7 +48,6 @@ extern Tag* Tag_new(uint32_t mem_address)
 	this->state = S_DEATH;
 	this->flash_address = mem_address;
 	this->ram_buffer = EMPTY_SERIAL;
-
 	return this;
 }
 
@@ -65,10 +65,11 @@ extern void Tag_sleep(Tag *this){
 
 }
 extern void Tag_storeMem(Tag* this){
-
+	FLASH_set_word(this->flash_address, this->serialNumber);
 }
+
 extern void Tag_loadMem(Tag* this){
-	this->ram_buffer = LOADED_SERIAL;
+	this->serialNumber = FLASH_read_word(this->flash_address);
 }
 
 extern void Tag_stop(Tag *this){
