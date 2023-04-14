@@ -12,7 +12,7 @@
 #include "stm32f1_gpio.h"
 #include "stm32f1_flash.h"
 
-#include "tag.h"
+#include "Tag_module/tag.h"
 
 int main(void)
 {
@@ -30,8 +30,8 @@ int main(void)
 	BSP_GPIO_PinCfg(BLUE_BUTTON_GPIO, BLUE_BUTTON_PIN, GPIO_MODE_INPUT,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
 
 	// Création du tag
-	int memory_address = 49;
-	Tag eco_tag = Tag_new(memory_address);
+	uint32_t memory_address = 49;
+	Tag *eco_tag = Tag_new(memory_address);
 
 	// Démarrage du tag
 
@@ -43,24 +43,31 @@ int main(void)
 		//Si on reçoit une donnée
 		if( UART_data_ready(UART2_ID) )
 		{
-
-			switch(UART_get_next_byte(UART2_ID))
-			{
-
-			case '?':
-				Tag_printSerial(eco_tag);
-				break;
-			case 'L':
-				Tag_loadMem(eco_tag);
-				break;
-			case 'S':
-				Tag_storeMem(eco_tag);
-				break;
-			case '.':
-				Tag_sleep(eco_tag);
-				break;
-			default:
-				break;
+			// TODO:  Remove useless comment
+			// switch(UART_get_next_byte(UART2_ID))
+			// {
+			// case '?':
+			// 	Tag_printSerial(eco_tag);
+			// 	break;
+			// case 'L':
+			// 	Tag_loadMem(eco_tag);
+			// 	break;
+			// case 'S':
+			// 	Tag_storeMem(eco_tag);
+			// 	break;
+			// case '.':
+			// 	Tag_sleep(eco_tag);
+			// 	break;
+			// default:
+			// 	break;
+			// }
+			
+			for(Event c = E_PRINT; c <= E_STOP; c++){ // On check la validité de la commande
+				uint8_t next_byte = UART_get_next_byte(UART2_ID);
+				if(next_byte == (char) c){
+					Tag_run(eco_tag, next_byte);
+					break;
+				}
 			}
 		}
 	}
