@@ -25,9 +25,10 @@
 
 
 // PRIVATE CONSTANTS -----------------------------------------------------------
-struct tag_t{uint32_t mem_address;
-uint32_t ram_buffer;
-State state;};
+struct tag_t{
+	uint32_t flash_address;
+	uint32_t ram_buffer;
+	State state;};
 
 
 // PRIVATE FUNCTIONS DEFINITIONS -----------------------------------------------
@@ -39,17 +40,19 @@ State state;};
 extern Tag* Tag_new(uint32_t mem_address)
 {
 	Tag* this;
-	...
+	this=(Tag* )malloc(sizeof(Tag));
 
 	this->state = S_DEATH;
 	this->flash_address = mem_address;
 	this->ram_buffer = EMPTY_SERIAL;
 
-	...
+	return this;
 }
 
 extern setSerial(uint32_t){
 }
 }
 
-
+extern void Tag_free(Tag *this){
+	free(this);
+}
