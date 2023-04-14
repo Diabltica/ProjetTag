@@ -56,7 +56,7 @@ extern void Tag_start(Tag *this){
 }
 
 extern void Tag_setSerial(Tag *this, uint32_t serial){
-
+	this->serialNumber = serial;
 }
 
 extern void Tag_printSerial(Tag* this){
@@ -76,7 +76,8 @@ extern void Tag_loadMem(Tag* this){
 }
 
 extern void Tag_stop(Tag *this){
-
+	Tag_storeMem(this);
+	Tag_free(this);
 }
 
 extern void Tag_free(Tag *this){
