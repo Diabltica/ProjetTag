@@ -44,22 +44,21 @@ typedef struct {
 	Action action;
 } Transition;
 
-//Tableau des transitions
-static Transition mySm[13][NB_EVENT] = {{S_LOADED, A_LOAD_MEM},
-									 	{S_LOADED, A_SET_SERIAL},
-
-										{S_SLEEP, A_SLEEP},
-										{S_LOADED, A_LOAD_MEM},
-										{S_LOADED, A_SET_SERIAL},
-										{S_LOADED, A_STORE_MEM},
-										{S_LOADED, A_PRINT_SERIAL},
-										{S_DEATH, A_STOP},
+static Transition mySm[NB_STATE][NB_EVENT] = {{{S_LOADED,A_SET_SERIAL},
+											   {S_LOADED,A_LOAD_MEM}}, // State Empty
 											  
-										{S_LOADED, A_LOAD_MEM},
-										{S_LOADED, A_SET_SERIAL},
-										{S_LOADED, A_PRINT_SERIAL},
-										{S_LOADED, A_STORE_MEM},
-										{S_DEATH, A_STOP}
+											  {{S_LOADED,A_PRINT_SERIAL},
+											   {S_LOADED,A_SET_SERIAL},
+											   {S_LOADED,A_LOAD_MEM},
+											   {S_LOADED,A_STORE_MEM},
+											   {S_SLEEP,A_SLEEP},
+											   {S_DEATH,A_STOP}}, // State Loaded 
+											  
+											  {{S_LOADED, A_LOAD_MEM},
+ 											   {S_LOADED, A_SET_SERIAL},
+ 											   {S_LOADED, A_PRINT_SERIAL},
+ 											   {S_LOADED, A_STORE_MEM},
+ 											   {S_DEATH, A_STOP}} // State Sleep
 };
 
 typedef void (*ActionPtr)();
@@ -116,7 +115,7 @@ extern void Tag_printSerial(Tag* this){
 }
 
 extern void Tag_sleep(Tag *this){
-
+	//TODO: Implement sleep mode : STOP
 }
 
 extern void Tag_storeMem(Tag* this){
