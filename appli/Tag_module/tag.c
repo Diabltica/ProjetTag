@@ -23,14 +23,14 @@
 
 typedef enum {
 	S_FORGET = 0, // Pas de changement
-	S_DEATH,
 	S_EMPTY,
 	S_LOADED,
-	S_SLEEP
+	S_SLEEP,
+	S_DEATH
 }State;
 
 typedef enum {
-	A_NOP, // Aucune action
+	A_NOP = 0, // Aucune action
 	A_LOAD_MEM,
 	A_SET_SERIAL,
 	A_PRINT_SERIAL,
@@ -44,19 +44,32 @@ typedef struct {
 	Action action;
 } Transition;
 
-static Transition mySm[NB_STATE][NB_EVENT] = {{{S_LOADED,A_SET_SERIAL},
-											   {S_LOADED,A_LOAD_MEM}}, // State Empty
-											  
-											  {{S_LOADED,A_PRINT_SERIAL},
-											   {S_LOADED,A_SET_SERIAL},
+typedef enum{
+	E_SET,
+	E_LOAD,
+	E_PRINT,
+	E_SLEEP,
+	E_STORE,
+	E_STOP
+}Event;
+
+static Transition mySm[NB_STATE][NB_EVENT] =  {{},
+											   {{S_LOADED,A_SET_SERIAL},
 											   {S_LOADED,A_LOAD_MEM},
-											   {S_LOADED,A_STORE_MEM},
-											   {S_SLEEP,A_SLEEP},
+											   {},{},{},
+
+											   {S_DEATH,A_STOP}}, // State Empty
+											  
+											  {{S_LOADED,A_SET_SERIAL},
+											   {S_LOADED,A_LOAD_MEM},
+											   {S_LOADED,A_PRINT_SERIAL},
+											   {S_LOADED,A_SLEEP},
+											   {S_SLEEP,A_STORE_MEM},
 											   {S_DEATH,A_STOP}}, // State Loaded 
 											  
 											  {{S_LOADED, A_LOAD_MEM},
  											   {S_LOADED, A_SET_SERIAL},
- 											   {S_LOADED, A_PRINT_SERIAL},
+ 											   {S_LOADED, A_PRINT_SERIAL},{},
  											   {S_LOADED, A_STORE_MEM},
  											   {S_DEATH, A_STOP}} // State Sleep
 };
@@ -66,6 +79,13 @@ typedef void (*ActionPtr)();
 // PRIVATE FUNCTIONS DECLARATIONS ----------------------------------------------
 
 void Tag_Nop(void);
+void printSerial(Tag *this);
+void setSerial(Tag *this);
+void sleep(Tag *this);
+void storeMem(Tag *this);
+void loadMem(Tag *this);
+void stop(Tag *this);
+extern void Tag_run(Tag *this, Event anEvent);
 
 // PRIVATE CONSTANTS -----------------------------------------------------------
 struct tag_t{
@@ -75,17 +95,43 @@ struct tag_t{
 	uint32_t serialNumber;};
 
 static const ActionPtr actionsTab[NB_ACTION] = {&Tag_Nop,
-												&Tag_loadMem,
-												&Tag_setSerial,
-												&Tag_printSerial,
-												&Tag_sleep,
-												&Tag_storeMem,
-												&Tag_stop};
+												&loadMem,
+												&setSerial,
+												&printSerial,
+												&sleep,
+												&storeMem,
+												&stop};
 
 
 // PRIVATE FUNCTIONS DEFINITIONS -----------------------------------------------
 
 void Tag_Nop(void){} // Do Nothing
+void printSerial(Tag *this){
+	printf("Serial Number: %d", (int)this->serialNumber);
+}
+
+void setSerial(Tag *this){
+	printf("New serial number: %d",(int)this->serialNumber);
+}
+
+void sleep(Tag *this){
+	printf("Good Night");
+}
+
+void storeMem(Tag *this){
+	printf("Store Serial %d at %d",this->serialNumber,this->flash_address);
+	FLASH_set_word(this->flash_address, this->serialNumber);
+}
+
+void loadMem(Tag *this){
+	printf("Load Serial Number at %d", this->flash_address);
+	this->serialNumber = FLASH_read_word(this->flash_address);
+}
+
+void stop(Tag *this){
+	printf("Goodbye !");
+	Tag_free(this);
+}
 
 // PUBLIC FUNCTIONS DEFINITIONS ------------------------------------------------
 
@@ -97,7 +143,6 @@ extern Tag* Tag_new(uint32_t mem_address)
 
 	this->state = S_EMPTY;
 	this->flash_address = mem_address;
-	this->ram_buffer = EMPTY_SERIAL;
 	this->serialNumber = 0;
 	return this;
 }
@@ -108,31 +153,33 @@ extern void Tag_start(Tag *this){
 
 extern void Tag_setSerial(Tag *this, uint32_t serial){
 	this->serialNumber = serial;
+	Tag_run(this, E_SET);
 }
 
 extern void Tag_printSerial(Tag* this){
-	printf("Serial Number: %d", (int)this->serialNumber);
+	Tag_run(this, E_PRINT);
 }
 
 extern void Tag_sleep(Tag *this){
-	//TODO: Implement sleep mode : STOP
+	Tag_run(this, E_SLEEP);
 }
 
 extern void Tag_storeMem(Tag* this){
-	FLASH_set_word(this->flash_address, this->serialNumber);
+	Tag_run(this, E_STORE);
 }
 
 extern void Tag_loadMem(Tag* this){
-	this->serialNumber = FLASH_read_word(this->flash_address);
+	Tag_run(this, E_LOAD);
 }
 
 extern void Tag_stop(Tag *this){
-	this->state = S_DEATH;
-	Tag_free(this);
+	Tag_run(this, E_STOP);
 }
 
 extern void Tag_free(Tag *this){
-	free(this);
+	if(this != NULL){
+		free(this);
+	}
 }
 
 //Machine à état
@@ -144,7 +191,7 @@ extern void Tag_run(Tag *this, Event anEvent){
 	aState = mySm[this->state][anEvent].destinationState;
 
 	if(aState != S_FORGET){
-		actionsTab[anAction]();
+		actionsTab[anAction](this);
 		this->state = aState;
 	}
 }
