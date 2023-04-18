@@ -36,13 +36,22 @@ int main(void)
 	uint32_t memory_address = 49;
 	Tag *eco_tag = Tag_new(memory_address);
 
+	 __HAL_RCC_GPIOC_CLK_ENABLE();
+	  GPIO_InitTypeDef GPIO_InitStruct = {0};
+	  GPIO_InitStruct.Pin = GPIO_PIN_5;
+	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+
 	// Démarrage du tag
 
 	Tag_start(eco_tag);
 
 	while(1)
 	{
-
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+		//HAL_Delay(500);
 		//Si on reçoit une donnée
 		if( UART_data_ready(UART2_ID) )
 		{

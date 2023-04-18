@@ -116,6 +116,9 @@ void setSerial(Tag *this){
 
 void sleep(Tag *this){
 	printf("Good Night");
+	HAL_SuspendTick();
+	HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+	HAL_ResumeTick();
 }
 
 void storeMem(Tag *this){
