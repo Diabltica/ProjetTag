@@ -70,7 +70,7 @@ static Transition mySm[NB_STATE][NB_EVENT] =  {{},
 											  {{S_LOADED, A_LOAD_MEM},
  											   {S_LOADED, A_SET_SERIAL},
  											   {S_LOADED, A_PRINT_SERIAL},{},
- 											   {S_LOADED, A_STORE_MEM},
+											   {S_LOADED, A_STORE_MEM},
  											   {S_DEATH, A_STOP}} // State Sleep
 };
 
@@ -117,10 +117,12 @@ void setSerial(Tag *this){
 }
 
 void sleep(Tag *this){
-	HAL_SuspendTick();
+	/*HAL_SuspendTick();
 	HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
-	HAL_ResumeTick();
+	HAL_ResumeTick();*/
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5,0);
+	sleep_asm();
+
 }
 
 void storeMem(Tag *this){

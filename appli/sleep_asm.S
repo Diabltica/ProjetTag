@@ -4,7 +4,7 @@
 .thumb
 
 @	Equates
-			...      @ Systick control register
+	.equ SYSTICK_STCSR,    0xE000E010      @ Systick control register
 
 .text
 
@@ -12,12 +12,12 @@
 sleep_asm:
 	@no parameters
 	LDR R0, =SYSTICK_STCSR	@ Loading Systick control register address
-	...						@ Fetching register content
-	...						@ Disabling SYSTICK
-	...						@ Storing to peripheral register (effective disable)
+	LDR R1, [R0]						@ Fetching register content
+	BIC R1, R1, #1						@ Disabling SYSTICK
+	STR R1, [R0]						@ Storing to peripheral register (effective disable)
 
-	...						@ Entering SLEEP mode with interrupt wake up
+	WFI						@ Entering SLEEP mode with interrupt wake up
 
-	...						@ Enabling SYSTICK
-	...						@ Storing to peripheral register (effective enable)
+	ORR R1, R1, #1						@ Enabling SYSTICK
+	STR R1, [R0]						@ Storing to peripheral register (effective enable)
 	BX LR

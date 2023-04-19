@@ -1,5 +1,6 @@
 "./appli/Tag_module/tag.o"
 "./appli/main.o"
+"./appli/sleep_asm.o"
 "./lib/bsp/MatrixLed/WS2812S.o"
 "./lib/bsp/MatrixLed/WS2812S_asm.o"
 "./lib/bsp/stm32f1_adc.o"
