@@ -108,32 +108,36 @@ static const ActionPtr actionsTab[NB_ACTION] = {&Tag_Nop,
 void Tag_Nop(void){} // Do Nothing
 void printSerial(Tag *this){
 	printf("Serial Number: %d", (int)this->serialNumber);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5,1);
 }
 
 void setSerial(Tag *this){
 	printf("New serial number: %d",(int)this->serialNumber);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5,1);
 }
 
 void sleep(Tag *this){
-	printf("Good Night");
 	HAL_SuspendTick();
 	HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 	HAL_ResumeTick();
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5,0);
 }
 
 void storeMem(Tag *this){
-	printf("Store Serial %d at %d",this->serialNumber,this->flash_address);
+	printf("Store Serial %d at %d",(int)this->serialNumber,(int)this->flash_address);
 	FLASH_set_word(this->flash_address, this->serialNumber);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5,1);
 }
 
 void loadMem(Tag *this){
-	printf("Load Serial Number at %d", this->flash_address);
+	printf("Load Serial Number at %d",(int) this->flash_address);
 	this->serialNumber = FLASH_read_word(this->flash_address);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5,1);
 }
 
 void stop(Tag *this){
 	printf("Goodbye !");
-	Tag_free(this);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5,0);
 }
 
 // PUBLIC FUNCTIONS DEFINITIONS ------------------------------------------------
