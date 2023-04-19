@@ -20,6 +20,7 @@ extern void Tag_printSerial(Tag* this);
 extern void Tag_sleep(Tag *this);
 extern void Tag_storeMem(Tag* this);
 extern void Tag_loadMem(Tag* this);
+extern void Tag_temp(Tag *this);
 
 extern void Tag_stop(Tag *this);
 extern void Tag_free(Tag *this);

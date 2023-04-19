@@ -16,8 +16,8 @@
 
 #define EMPTY_SERIAL	(0xFFFFFFFF)
 #define NB_STATE 4
-#define NB_EVENT 6
-#define NB_ACTION 7
+#define NB_EVENT 7
+#define NB_ACTION 8
 
 // PRIVATE TYPES ---------------------------------------------------------------
 
@@ -36,7 +36,8 @@ typedef enum {
 	A_PRINT_SERIAL,
 	A_SLEEP,
 	A_STORE_MEM,
-	A_STOP
+	A_STOP,
+	A_TEMP
 }Action;
 
 typedef struct {
@@ -50,7 +51,8 @@ typedef enum{
 	E_PRINT,
 	E_SLEEP,
 	E_STORE,
-	E_STOP
+	E_STOP,
+	E_TEMP,
 }Event;
 
 static Transition mySm[NB_STATE][NB_EVENT] =  {{},
@@ -65,13 +67,15 @@ static Transition mySm[NB_STATE][NB_EVENT] =  {{},
 											   {S_LOADED,A_PRINT_SERIAL},
 											   {S_LOADED,A_SLEEP},
 											   {S_SLEEP,A_STORE_MEM},
-											   {S_DEATH,A_STOP}}, // State Loaded 
+											   {S_DEATH,A_STOP},
+											   {S_LOADED,A_TEMP}}, // State Loaded
 											  
 											  {{S_LOADED, A_LOAD_MEM},
  											   {S_LOADED, A_SET_SERIAL},
  											   {S_LOADED, A_PRINT_SERIAL},{},
 											   {S_LOADED, A_STORE_MEM},
- 											   {S_DEATH, A_STOP}} // State Sleep
+ 											   {S_DEATH, A_STOP},
+											   {S_LOADED, A_TEMP}} // State Sleep
 };
 
 typedef void (*ActionPtr)();
@@ -85,6 +89,7 @@ void sleep(Tag *this);
 void storeMem(Tag *this);
 void loadMem(Tag *this);
 void stop(Tag *this);
+void temp(Tag *this);
 extern void Tag_run(Tag *this, Event anEvent);
 
 // PRIVATE CONSTANTS -----------------------------------------------------------
@@ -100,7 +105,8 @@ static const ActionPtr actionsTab[NB_ACTION] = {&Tag_Nop,
 												&printSerial,
 												&sleep,
 												&storeMem,
-												&stop};
+												&stop,
+												&temp};
 
 
 // PRIVATE FUNCTIONS DEFINITIONS -----------------------------------------------
@@ -140,6 +146,12 @@ void loadMem(Tag *this){
 void stop(Tag *this){
 	printf("Goodbye !");
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5,0);
+}
+
+void temp(Tag *this){
+	int r = rand() % 20;
+	printf("La température est de : %d °C", r);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5,1);
 }
 
 // PUBLIC FUNCTIONS DEFINITIONS ------------------------------------------------
@@ -183,6 +195,10 @@ extern void Tag_loadMem(Tag* this){
 
 extern void Tag_stop(Tag *this){
 	Tag_run(this, E_STOP);
+}
+
+extern void Tag_temp(Tag *this){
+	Tag_run(this, E_TEMP);
 }
 
 extern void Tag_free(Tag *this){

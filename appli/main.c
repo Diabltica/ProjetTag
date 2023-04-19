@@ -72,6 +72,9 @@ int main(void)
 			 case '.':
 				Tag_sleep(eco_tag);
 				break;
+			 case 't':
+				 Tag_temp(eco_tag);
+				 break;
 			 case 27:
 				Tag_stop(eco_tag);
 				Tag_free(eco_tag);
